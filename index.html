@@ -407,6 +407,36 @@
                                 <button type="submit" class="w-full bg-safety hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-4 shadow-md shadow-orange-500/20">
                                     Enviar Mensaje Directo
                                 </button>
+                                <form id="contactForm">
+    
+                                <div>
+                                    <label>Nombre o Empresa</label>
+                                    <input type="text" id="nombre" placeholder="Tu nombre..." required>
+                                </div>
+                                
+                                <div>
+                                    <label>Teléfono</label>
+                                    <input type="text" id="telefono" placeholder="Ej: +569..." required>
+                                </div>
+                                
+                                <div>
+                                    <label>Correo Electrónico Corporativo</label>
+                                    <input type="email" id="email" placeholder="correo@empresa.com" required>
+                                </div>
+                                
+                                <div>
+                                    <label>Motivo de contacto</label>
+                                    <input type="text" id="motivo" placeholder="Ej: Cotización" required>
+                                </div>
+                                
+                                <div>
+                                    <label>Detalles del requerimiento</label>
+                                    <textarea id="detalles" rows="4" placeholder="Cuéntanos más..." required></textarea>
+                                </div>
+                                
+                                <button type="submit" id="btnEnviar">Enviar Mensaje Directo</button>
+
+</form>
                             </div>
                         </form>
                     </div>
