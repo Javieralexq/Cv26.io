@@ -1,583 +1,78 @@
-
-<html lang="es" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ing. Javier Quispe | SSOMA 4.0 & Data Analytics</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        navy: '#0f172a',
-                        steel: '#64748b',
-                        safety: '#f97316',
-                        lightbg: '#f8fafc',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
-        .hero-bg {
-            background-color: #0f172a;
-            background-image: radial-gradient(circle at top right, rgba(249, 115, 22, 0.15), transparent 40%),
-                              radial-gradient(circle at bottom left, rgba(100, 116, 139, 0.2), transparent 40%);
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 350px;
-            max-height: 400px;
-        }
-        @media (min-width: 768px) { .chart-container { height: 400px; } }
-        .carousel-track {
-            display: flex;
-            width: calc(250px * 8);
-            animation: scroll 20s linear infinite;
-        }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-250px * 4)); }
-        }
-        .carousel-item {
-            width: 250px; flex-shrink: 0; display: flex; justify-content: center; align-items: center;
-        }
-        .timeline-line {
-            width: 2px; background-color: #e2e8f0; position: absolute; left: 11px; top: 10px; bottom: 10px; z-index: 0;
-        }
-        .timeline-dot {
-            width: 24px; height: 24px; border-radius: 50%; background-color: #f97316; border: 4px solid white; position: relative; z-index: 1; transition: all 0.3s ease;
-        }
-        .timeline-item.active .timeline-dot {
-            transform: scale(1.2); box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2);
-        }
-        .timeline-content { display: none; }
-        .timeline-content.active { display: block; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .float-anim { animation: float 6s ease-in-out infinite; }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #64748b; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #0f172a; }
-    </style>
-</head>
-<body class="antialiased selection:bg-safety selection:text-white relative">
-    <!-- Chosen Palette: Navy (Professionalism/Corporate), Steel (Industrial base), Safety Orange (Energy/Action/Warning), Lightbg (Clean layout) -->
-    <!-- Application Structure Plan: The SPA is structured as a continuous professional narrative. It opens with a striking Hero section that integrates the user's professional image with a digital ID overlay, establishing immediate identity. It logically flows into 'Impacto' (Data/KPIs) to prove value, then 'Experiencia & Tech' to explain the methodology (combining a timeline with a radar chart), validates this with 'Formación' and 'Logos', and ends with a clear Call to Action. This structure is designed for recruiters and managers to digest complex hybrid skills (SSOMA + Data) effortlessly. -->
-    <!-- Visualization & Content Choices: 
-         - KPIs (Impacto) -> Goal: Inform -> Dynamic Counters -> Interaction: Scroll trigger -> Justification: Delivers immediate quantitative proof of value.
-         - Experience -> Goal: Process/Timeline -> Interactive List -> Interaction: Click to reveal details -> Justification: Organizes chronological data without overwhelming the UI.
-         - Skills -> Goal: Relationships -> Radar Chart -> Interaction: Hover tooltips -> Justification: Best visual representation of a multidisciplinary profile (traditional vs tech skills). Library: Chart.js.
-         - Identity -> Goal: Inform -> Floating Digital ID -> Interaction: CSS Animation -> Justification: Overlays generic uniform text with accurate professional title organically.
-         Confirming NO SVG/Mermaid used. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-
-    <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 font-bold text-xl tracking-tighter">
-                    <span class="text-white nav-text transition-colors">JQ</span><span class="text-safety">.</span>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="#inicio" class="text-white hover:text-safety transition-colors px-3 py-2 rounded-md text-sm font-medium nav-link">Inicio</a>
-                        <a href="#impacto" class="text-white hover:text-safety transition-colors px-3 py-2 rounded-md text-sm font-medium nav-link">Impacto</a>
-                        <a href="#experiencia" class="text-white hover:text-safety transition-colors px-3 py-2 rounded-md text-sm font-medium nav-link">Experiencia & Tech</a>
-                        <a href="#certificaciones" class="text-white hover:text-safety transition-colors px-3 py-2 rounded-md text-sm font-medium nav-link">Formación</a>
-                        <a href="#contacto" class="bg-safety text-white hover:bg-orange-600 px-4 py-2 rounded-full text-sm font-bold transition-shadow shadow-lg shadow-orange-500/30">Contactar</a>
-                    </div>
-                </div>
-            </div>
+<section id="contacto" class="py-24 bg-white relative">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12" data-aos="fade-up">
+            <h2 class="text-3xl font-bold text-navy mb-4">Disponibilidad Profesional</h2>
+            <p class="text-steel max-w-2xl mx-auto">
+                Si su operación requiere transformar los datos de seguridad en estrategias preventivas rentables y seguras, utilice los siguientes canales para establecer contacto directo.
+            </p>
         </div>
-    </nav>
-
-    <section id="inicio" class="hero-bg min-h-screen flex items-center justify-center relative pt-20 overflow-hidden">
-        <div class="absolute inset-0 z-0 opacity-10" style="background-image: linear-gradient(#64748b 1px, transparent 1px), linear-gradient(90deg, #64748b 1px, transparent 1px); background-size: 40px 40px;"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center" data-aos="zoom-in" data-aos-duration="1000">
-            <div class="text-left mt-10 lg:mt-0">
-                <div class="inline-block px-4 py-1.5 rounded-full border border-steel/50 bg-navy/80 backdrop-blur-sm text-steel mb-6 text-sm font-semibold tracking-wide uppercase shadow-lg">
-                    Ingeniero CIP 134763
-                </div>
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
-                    Javier Quispe <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-safety to-yellow-500">Ingeniería SSOMA 4.0</span>
-                </h1>
-                <p class="text-xl md:text-2xl text-slate-300 font-light mb-10 max-w-xl">
-                    Liderando la seguridad industrial en minería mediante el análisis avanzado de datos y la gestión predictiva de riesgos críticos.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="#impacto" class="bg-safety hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:-translate-y-1 shadow-lg shadow-orange-500/25 text-center">
-                        Ver Resultados
-                    </a>
-                    <a href="curriculum-2026.pdf" 
-                        download="Curriculum_Javier_Quispe.pdf"
-                        class="inline-block bg-transparent border-2 border-white hover:bg-white hover:text-blue-900 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 text-center">
-                        Descargar CV
-                    </a>
-                </div>
-            </div>
-            <div class="flex justify-center lg:justify-end relative mt-12 lg:mt-0 pb-10 lg:pb-0">
-                <div class="absolute inset-0 bg-gradient-to-tr from-safety to-navy opacity-30 rounded-[2rem] transform rotate-3 scale-105 blur-sm"></div>
-                <div class="relative z-10 rounded-[2rem] shadow-2xl overflow-hidden border-4 border-slate-800 bg-white max-w-sm xl:max-w-md w-full">
-                    <img src="https://github.com/Javieralexq/fotoPower1/blob/main/unnamed.jpg?raw=true" alt="Ing. Javier Quispe" class="w-full h-auto object-cover object-top" style="max-height: 600px;">
-                </div>
-                <div class="absolute bottom-4 -left-4 sm:-left-8 bg-white/95 backdrop-blur-md border border-slate-200 p-4 rounded-xl shadow-2xl z-20 flex items-center gap-4 float-anim w-72">
-                    <div class="bg-navy p-2 rounded-lg text-safety font-black text-xl flex items-center justify-center h-12 w-12 shrink-0">
-                        ID
-                    </div>
+        <div class="bg-lightbg rounded-3xl shadow-xl border border-slate-200 overflow-hidden" data-aos="zoom-in-up">
+            <div class="grid grid-cols-1 md:grid-cols-5">
+                <div class="bg-navy p-10 md:col-span-2 text-white flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-safety/20 rounded-bl-full -mr-10 -mt-10"></div>
                     <div>
-                        <p class="text-navy font-extrabold text-lg leading-none mb-1">Ing. Javier Alex Quispe</p>
-                        <p class="text-steel text-xs font-bold uppercase tracking-wider">Supervisión SSOMA</p>
-                        <div class="flex gap-1 mt-2 items-center">
-                            <span class="block w-2 h-2 rounded-full bg-green-500"></span>
-                            <span class="text-[10px] text-slate-500 leading-none font-bold">ACCESO AUTORIZADO</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute top-10 -right-4 sm:-right-8 bg-navy p-3 rounded-xl shadow-xl z-20 border border-slate-700 float-anim" style="animation-delay: 1.5s;">
-                    <div class="text-center">
-                        <span class="block text-2xl mb-1">📊</span>
-                        <span class="text-safety text-[10px] font-bold tracking-widest uppercase">Data Driven</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="impacto" class="py-20 bg-lightbg relative border-t border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h2 class="text-3xl font-bold text-navy mb-4">Integrando Datos y Seguridad Industrial</h2>
-                <p class="text-steel leading-relaxed max-w-3xl mx-auto">
-                    El enfoque SSOMA 4.0 transforma la gestión reactiva en un modelo predictivo. Esta sección cuantifica el impacto real de aplicar modelos de Machine Learning y automatización de reportes sobre los indicadores críticos de seguridad minera, demostrando que los datos salvan vidas y optimizan recursos.
-                </p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="kpi-container">
-                <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-safety/30 transition-all duration-300 relative overflow-hidden group" data-aos="fade-up" data-aos-delay="100">
-                    <div class="text-safety text-4xl font-black mb-2 flex items-baseline">
-                        <span class="counter" data-target="90">0</span><span class="text-2xl ml-1">%</span>
-                    </div>
-                    <p class="text-navy font-bold mb-1">Reducción de Incidentes</p>
-                    <p class="text-steel text-sm">Disminución de eventos peligrosos mediante modelos predictivos en Python.</p>
-                </div>
-                <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-safety/30 transition-all duration-300 relative overflow-hidden group" data-aos="fade-up" data-aos-delay="200">
-                    <div class="text-navy text-4xl font-black mb-2 flex items-baseline">
-                        <span class="counter" data-target="85">0</span><span class="text-2xl ml-1">%</span>
-                    </div>
-                    <p class="text-navy font-bold mb-1">Impacto Ambiental</p>
-                    <p class="text-steel text-sm">Reducción de contaminación en suelos por gestión y análisis optimizado en R.</p>
-                </div>
-                <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-safety/30 transition-all duration-300 relative overflow-hidden group" data-aos="fade-up" data-aos-delay="300">
-                    <div class="text-safety text-4xl font-black mb-2 flex items-baseline">
-                        <span class="counter" data-target="0">10</span>
-                    </div>
-                    <p class="text-navy font-bold mb-1">Incidentes Críticos</p>
-                    <p class="text-steel text-sm">Cero accidentes fatales en trabajos de alto riesgo bajo supervisión directa.</p>
-                </div>
-                <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-safety/30 transition-all duration-300 relative overflow-hidden group" data-aos="fade-up" data-aos-delay="400">
-                    <div class="text-navy text-4xl font-black mb-2 flex items-baseline">
-                        <span class="counter" data-target="6">0</span><span class="text-2xl ml-1">+</span>
-                    </div>
-                    <p class="text-navy font-bold mb-1">Años de Experiencia</p>
-                    <p class="text-steel text-sm">Gestión integral operativa exclusiva en el sector minero-metalúrgico.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="experiencia" class="py-24 bg-white relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16" data-aos="fade-up">
-                <h2 class="text-3xl font-bold text-navy mb-4">Evolución Profesional & Stack Tecnológico</h2>
-                <p class="text-steel max-w-3xl mx-auto">
-                    A continuación, se detalla la progresión operativa en terreno interactuando con el mapa de competencias técnicas. El gráfico de radar ilustra visualmente el equilibrio entre el conocimiento normativo tradicional y las habilidades tecnológicas avanzadas que definen la Ingeniería SSOMA 4.0.
-                </p>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-                <div class="relative" data-aos="fade-right">
-                    <h3 class="text-xl font-bold text-navy mb-8 flex items-center">
-                        <span class="text-safety font-bold text-2xl mr-3">⚒</span> Trayectoria Operativa
-                    </h3>
-                    <div class="relative pl-8">
-                        <div class="timeline-line"></div>
-                        <div class="mb-8 relative cursor-pointer group" onclick="toggleTimeline('exp1')">
-                            <div class="timeline-item active" id="dot-exp1">
-                                <div class="timeline-dot absolute -left-8"></div>
-                                <h4 class="text-lg font-bold text-navy group-hover:text-safety transition-colors">Supervisor Senior SSOMA</h4>
-                                <p class="text-sm font-semibold text-safety mb-2">2021 - Presente | Operaciones Subterráneas</p>
+                        <h3 class="text-2xl font-bold mb-6 text-white">Información de Contacto</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center text-sm text-slate-300">
+                                <span class="text-safety text-2xl mr-4">✉</span> javier.quispe@cip.org.pe
                             </div>
-                            <div class="timeline-content active bg-lightbg p-5 rounded-lg shadow-inner border border-slate-200 mt-2" id="content-exp1">
-                                <ul class="text-sm text-steel space-y-2">
-                                    <li class="flex"><span class="text-safety mr-2">▸</span> Liderazgo de equipos en operaciones de perforación y voladura.</li>
-                                    <li class="flex"><span class="text-safety mr-2">▸</span> Implementación de dashboards en Power BI para control de actos y condiciones.</li>
-                                    <li class="flex"><span class="text-safety mr-2">▸</span> Auditorías de cumplimiento legal D.S. 024-2016-EM.</li>
-                                </ul>
+                            <div class="flex items-center text-sm text-slate-300">
+                                <span class="text-safety text-2xl mr-4">✆</span> +51 970 597 269
                             </div>
-                        </div>
-                        <div class="mb-8 relative cursor-pointer group" onclick="toggleTimeline('exp2')">
-                            <div class="timeline-item" id="dot-exp2">
-                                <div class="timeline-dot absolute -left-8"></div>
-                                <h4 class="text-lg font-bold text-navy group-hover:text-safety transition-colors">Analista de Datos de Seguridad</h4>
-                                <p class="text-sm font-semibold text-steel mb-2">2019 - 2021 | Planta Concentradora</p>
-                            </div>
-                            <div class="timeline-content bg-lightbg p-5 rounded-lg shadow-inner border border-slate-200 mt-2" id="content-exp2">
-                                <ul class="text-sm text-steel space-y-2">
-                                    <li class="flex"><span class="text-safety mr-2">▸</span> Desarrollo de modelos predictivos en Python para anticipar fallas críticas.</li>
-                                    <li class="flex"><span class="text-safety mr-2">▸</span> Minería de datos para identificar patrones de comportamiento recurrente.</li>
-                                    <li class="flex"><span class="text-safety mr-2">▸</span> Optimización de reportes HSE, automatizando el 40% del tiempo administrativo.</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="relative cursor-pointer group" onclick="toggleTimeline('exp3')">
-                            <div class="timeline-item" id="dot-exp3">
-                                <div class="timeline-dot absolute -left-8"></div>
-                                <h4 class="text-lg font-bold text-navy group-hover:text-safety transition-colors">Ingeniero de Medio Ambiente</h4>
-                                <p class="text-sm font-semibold text-steel mb-2">2017 - 2019 | Gestión de Relaves</p>
-                            </div>
-                            <div class="timeline-content bg-lightbg p-5 rounded-lg shadow-inner border border-slate-200 mt-2" id="content-exp3">
-                                <ul class="text-sm text-steel space-y-2">
-                                    <li class="flex"><span class="text-safety mr-2">▸</span> Monitoreo de calidad de agua y suelos en zona de influencia directa.</li>
-                                    <li class="flex"><span class="text-safety mr-2">▸</span> Análisis estadístico avanzado de parámetros ambientales utilizando R Studio.</li>
-                                    <li class="flex"><span class="text-safety mr-2">▸</span> Coordinación de planes de respuesta a emergencias ambientales.</li>
-                                </ul>
+                            <div class="flex items-center text-sm text-slate-300">
+                                <span class="text-safety text-2xl mr-4">📍</span> Lima, Perú (Movilidad Nacional)
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="bg-lightbg p-8 rounded-2xl shadow-md border border-slate-200" data-aos="fade-left">
-                    <h3 class="text-xl font-bold text-navy mb-2 flex items-center justify-center">
-                        <span class="text-safety font-bold text-2xl mr-3">💻</span> Mapa de Competencias
-                    </h3>
-                    <p class="text-center text-sm text-steel mb-6">Interactúe con el gráfico para ver el balance de habilidades.</p>
-                    <div class="chart-container">
-                        <canvas id="skillsRadarChart"></canvas>
-                    </div>
-                    <div class="mt-8 flex flex-wrap justify-center gap-2">
-                        <span class="px-3 py-1 bg-white text-navy text-xs font-bold rounded-full border border-slate-300 shadow-sm hover:border-safety transition-colors cursor-default">Python / Pandas</span>
-                        <span class="px-3 py-1 bg-white text-navy text-xs font-bold rounded-full border border-slate-300 shadow-sm hover:border-safety transition-colors cursor-default">R Studio</span>
-                        <span class="px-3 py-1 bg-safety text-white text-xs font-bold rounded-full shadow-sm shadow-orange-500/30 cursor-default">Power BI / DAX</span>
-                        <span class="px-3 py-1 bg-white text-navy text-xs font-bold rounded-full border border-slate-300 shadow-sm hover:border-safety transition-colors cursor-default">Excel Avanzado</span>
-                        <span class="px-3 py-1 bg-white text-navy text-xs font-bold rounded-full border border-slate-300 shadow-sm hover:border-safety transition-colors cursor-default">AutoCAD 3D</span>
-                        <span class="px-3 py-1 bg-navy text-white text-xs font-bold rounded-full shadow-sm cursor-default">ISO 45001/14001</span>
+                    <div class="mt-12 space-y-4 relative z-10">
+                        <a href="https://www.linkedin.com/in/javier-alex-quispe-almerco-883250346" 
+                           target="_blank" rel="noopener noreferrer" 
+                           class="w-full bg-[#0077b5] hover:bg-[#005582] text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
+                           <span class="mr-2 font-bold text-lg">in</span> Conectar en LinkedIn
+                        </a>
+                        <a href="curriculum-2026.pdf" class="block w-full text-center bg-transparent border border-slate-500 hover:border-white text-white font-semibold py-3 px-4 rounded-lg transition-colors">
+                            Ver CV
+                        </a>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <section id="certificaciones" class="py-24 bg-lightbg relative border-y border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16" data-aos="fade-up">
-                <h2 class="text-3xl font-bold text-navy mb-4">Respaldo Académico y Colegiatura</h2>
-                <p class="text-steel max-w-3xl mx-auto">
-                    La innovación en ingeniería requiere una base sólida. Esta sección documenta las certificaciones oficiales y estudios de posgrado que avalan la competencia técnica y legal para firmar y auditar sistemas de gestión.
-                </p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white rounded-xl p-6 text-center border border-slate-200 hover:border-safety transition-colors group shadow-sm" data-aos="zoom-in" data-aos-delay="100">
-                    <div class="w-16 h-16 mx-auto bg-navy rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
-                        <span class="text-xl font-bold text-white tracking-tighter">UNMSM</span>
-                    </div>
-                    <h4 class="font-bold text-navy mb-2">Maestría Sistemas Gestión</h4>
-                    <p class="text-xs text-safety font-bold mb-2">Universidad Nacional Mayor de San Marcos</p>
-                    <p class="text-sm text-steel">Enfoque integral estratégico en Calidad, Medio Ambiente y Seguridad (HSEQ).</p>
-                </div>
-                <div class="bg-white rounded-xl p-6 text-center border border-slate-200 hover:border-safety transition-colors group shadow-sm" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="w-16 h-16 mx-auto bg-navy rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
-                        <span class="text-xl font-bold text-white tracking-tighter">UNI</span>
-                    </div>
-                    <h4 class="font-bold text-navy mb-2">Diplomado en Analítica</h4>
-                    <p class="text-xs text-safety font-bold mb-2">Universidad Nacional de Ingeniería</p>
-                    <p class="text-sm text-steel">Especialización en Machine Learning, Big Data e Inteligencia de Negocios.</p>
-                </div>
-                <div class="bg-white rounded-xl p-6 text-center border border-slate-200 hover:border-safety transition-colors group shadow-sm" data-aos="zoom-in" data-aos-delay="300">
-                    <div class="w-16 h-16 mx-auto bg-navy rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
-                        <span class="text-xl font-bold text-white tracking-tighter">UC</span>
-                    </div>
-                    <h4 class="font-bold text-navy mb-2">Diplomado SSOMA Minero</h4>
-                    <p class="text-xs text-safety font-bold mb-2">Universidad Continental</p>
-                    <p class="text-sm text-steel">Dominio en normativa legal vigente, procesos de fiscalización y operaciones críticas.</p>
-                </div>
-                <div class="bg-white rounded-xl p-6 text-center border border-slate-200 hover:border-safety transition-colors group shadow-sm" data-aos="zoom-in" data-aos-delay="400">
-                    <div class="w-16 h-16 mx-auto bg-safety rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md shadow-orange-500/40">
-                        <span class="text-xl font-bold text-white tracking-tighter">UNDAC</span>
-                    </div>
-                    <h4 class="font-bold text-navy mb-2">Ingeniería Metalúrgica</h4>
-                    <p class="text-xs text-navy font-bold mb-2 border-b border-slate-100 pb-1">Daniel Alcides Carrión</p>
-                    <p class="text-sm font-bold text-steel bg-slate-100 py-1 rounded mt-2 shadow-inner">CIP: 134763</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-16 bg-navy overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 text-center" data-aos="fade-in">
-            <p class="text-slate-400 text-sm tracking-widest uppercase font-bold">Historial comprobado en líderes del sector minero</p>
-        </div>
-        <div class="w-full relative">
-            <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-navy to-transparent z-10"></div>
-            <div class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-navy to-transparent z-10"></div>
-            <div class="carousel-track">
-                <div class="carousel-item"><div class="text-white/50 font-black text-2xl tracking-tighter uppercase hover:text-white transition-colors cursor-default">Nexa <span class="text-safety">Resources</span></div></div>
-                <div class="carousel-item"><div class="text-white/50 font-black text-3xl tracking-widest uppercase hover:text-white transition-colors cursor-default">VOLCAN</div></div>
-                <div class="carousel-item"><div class="text-white/50 font-bold text-2xl flex items-center gap-2 hover:text-white transition-colors cursor-default"><span class="w-6 h-6 bg-safety rounded-sm rotate-45 inline-block opacity-70"></span> Buenaventura</div></div>
-                <div class="carousel-item"><div class="text-white/50 font-serif font-bold text-xl uppercase text-center leading-tight hover:text-white transition-colors cursor-default">Pan American<br><span class="text-steel">Silver</span></div></div>
-                <div class="carousel-item"><div class="text-white/50 font-black text-2xl tracking-tighter uppercase hover:text-white transition-colors cursor-default">Nexa <span class="text-safety">Resources</span></div></div>
-                <div class="carousel-item"><div class="text-white/50 font-black text-3xl tracking-widest uppercase hover:text-white transition-colors cursor-default">VOLCAN</div></div>
-                <div class="carousel-item"><div class="text-white/50 font-bold text-2xl flex items-center gap-2 hover:text-white transition-colors cursor-default"><span class="w-6 h-6 bg-safety rounded-sm rotate-45 inline-block opacity-70"></span> Buenaventura</div></div>
-                <div class="carousel-item"><div class="text-white/50 font-serif font-bold text-xl uppercase text-center leading-tight hover:text-white transition-colors cursor-default">Pan American<br><span class="text-steel">Silver</span></div></div>
-            </div>
-        </div>
-    </section>
-
-    <section id="contacto" class="py-24 bg-white relative">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h2 class="text-3xl font-bold text-navy mb-4">Disponibilidad Profesional</h2>
-                <p class="text-steel max-w-2xl mx-auto">
-                    Si su operación requiere transformar los datos de seguridad en estrategias preventivas rentables y seguras, utilice los siguientes canales para establecer contacto directo.
-                </p>
-            </div>
-            <div class="bg-lightbg rounded-3xl shadow-xl border border-slate-200 overflow-hidden" data-aos="zoom-in-up">
-                <div class="grid grid-cols-1 md:grid-cols-5">
-                    <div class="bg-navy p-10 md:col-span-2 text-white flex flex-col justify-between relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-safety/20 rounded-bl-full -mr-10 -mt-10"></div>
-                        <div>
-                            <h3 class="text-2xl font-bold mb-6 text-white">Información de Contacto</h3>
-                            <div class="space-y-6">
-                                <div class="flex items-center text-sm text-slate-300">
-                                    <span class="text-safety text-2xl mr-4">✉</span> javier.quispe@cip.org.pe
-                                </div>
-                                <div class="flex items-center text-sm text-slate-300">
-                                    <span class="text-safety text-2xl mr-4">✆</span> +51 970 597 269
-                                </div>
-                                <div class="flex items-center text-sm text-slate-300">
-                                    <span class="text-safety text-2xl mr-4">📍</span> Lima, Perú (Movilidad Nacional)
-                                </div>
+                <div class="p-10 md:col-span-3 bg-white">
+                    <h3 class="text-xl font-bold text-navy mb-6">Envíe su propuesta o consulta</h3>
+                    <form id="contactForm">
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-steel mb-1">Nombre o Empresa</label>
+                                <input type="text" id="nombre" placeholder="Tu nombre..." required 
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-safety focus:border-transparent outline-none transition-all">
                             </div>
-                        </div>
-                        <div class="mt-12 space-y-4 relative z-10">
-                            
-                            <a href="https://www.linkedin.com/in/javier-alex-quispe-almerco-883250346" 
-                               target="_blank"  
-                               rel="noopener noreferrer" 
-                               class="w-full bg-[#0077b5] hover:bg-[#005582] text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
-                               <span class="mr-2 font-bold text-lg">in</span> Conectar en LinkedIn
-                            </a>
-                            <a href="curriculum-2026.pdf" class="block w-full text-center bg-transparent border border-slate-500 hover:border-white text-white font-semibold py-3 px-4 rounded-lg transition-colors">
-                                Ver CV
-                            </a>
-                        </div>
-                    </div>
-                    <div class="p-10 md:col-span-3 bg-white">
-                        <h3 class="text-xl font-bold text-navy mb-6">Envíe su propuesta o consulta</h3>
-                        <form id="contactForm" onsubmit="event.preventDefault(); alert('Mensaje simulado enviado con éxito.'); this.reset();">
-                            <div class="space-y-5">
-                                <div>
-                                    <label class="block text-sm font-semibold text-steel mb-1">Nombre o Empresa</label>
-                                    <input type="text" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-safety focus:border-transparent outline-none transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-steel mb-1">Teléfono</label>
-                                    <input type="text" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-safety focus:border-transparent outline-none transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-steel mb-1">Correo Electrónico Corporativo</label>
-                                    <input type="email" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-safety focus:border-transparent outline-none transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-steel mb-1">Motivo de contacto</label>
-                                    <input type="text" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-safety focus:border-transparent outline-none transition-all">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-steel mb-1">Detalles del requerimiento</label>
-                                    <textarea rows="4" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-safety focus:border-transparent outline-none transition-all resize-none"></textarea>
-                                </div>
-                                <button type="submit" class="w-full bg-safety hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-4 shadow-md shadow-orange-500/20">
-                                    Enviar Mensaje Directo
-                                </button>
-                                <form id="contactForm">
-    
-                                <div>
-                                    <label>Nombre o Empresa</label>
-                                    <input type="text" id="nombre" placeholder="Tu nombre..." required>
-                                </div>
-                                
-                                <div>
-                                    <label>Teléfono</label>
-                                    <input type="text" id="telefono" placeholder="Ej: +569..." required>
-                                </div>
-                                
-                                <div>
-                                    <label>Correo Electrónico Corporativo</label>
-                                    <input type="email" id="email" placeholder="correo@empresa.com" required>
-                                </div>
-                                
-                                <div>
-                                    <label>Motivo de contacto</label>
-                                    <input type="text" id="motivo" placeholder="Ej: Cotización" required>
-                                </div>
-                                
-                                <div>
-                                    <label>Detalles del requerimiento</label>
-                                    <textarea id="detalles" rows="4" placeholder="Cuéntanos más..." required></textarea>
-                                </div>
-                                
-                                <button type="submit" id="btnEnviar">Enviar Mensaje Directo</button>
-
-</form>
+                            <div>
+                                <label class="block text-sm font-semibold text-steel mb-1">Teléfono</label>
+                                <input type="text" id="telefono" placeholder="Ej: +51..." required 
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-safety focus:border-transparent outline-none transition-all">
                             </div>
-                        </form>
-                    </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-steel mb-1">Correo Electrónico Corporativo</label>
+                                <input type="email" id="email" placeholder="correo@empresa.com" required 
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-safety focus:border-transparent outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-steel mb-1">Motivo de contacto</label>
+                                <input type="text" id="motivo" placeholder="Ej: Cotización" required 
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-safety focus:border-transparent outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-steel mb-1">Detalles del requerimiento</label>
+                                <textarea id="detalles" rows="4" placeholder="Cuéntanos más..." required 
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-safety focus:border-transparent outline-none transition-all resize-none"></textarea>
+                            </div>
+                            <button type="submit" id="btnEnviar" 
+                                class="w-full bg-safety hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-4 shadow-md shadow-orange-500/20">
+                                Enviar Mensaje Directo
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </section>
-
-    <footer class="bg-navy py-10 text-center border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-4">
-            <p class="text-white font-semibold text-xl">Ing. Javier Quispe Almerco</p>
-            <p class="text-safety font-bold mt-2 tracking-widest text-sm bg-slate-800/50 inline-block px-5 py-1.5 rounded-full shadow-inner border border-slate-700">COLEGIATURA CIP: 134763</p>
-            <p class="text-slate-500 text-sm mt-8">© 2024 Perfil Profesional de Ingeniería SSOMA & Data Analytics.</p>
-        </div>
-    </footer>
-
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({ once: true, offset: 100, duration: 800 });
-
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            const navTexts = document.querySelectorAll('.nav-link, .nav-text');
-            if (window.scrollY > 50) {
-                nav.classList.add('bg-white/95', 'backdrop-blur-md', 'shadow-md');
-                navTexts.forEach(el => { el.classList.remove('text-white'); el.classList.add('text-navy'); });
-            } else {
-                nav.classList.remove('bg-white/95', 'backdrop-blur-md', 'shadow-md');
-                navTexts.forEach(el => { el.classList.add('text-white'); el.classList.remove('text-navy'); });
-            }
-        });
-
-        const counters = document.querySelectorAll('.counter');
-        const speed = 100;
-        const animateCounters = () => {
-            counters.forEach(counter => {
-                const target = +counter.getAttribute('data-target');
-                if(target === 0) { counter.innerText = '0'; return; }
-                const count = +counter.innerText;
-                const inc = target / speed;
-                if (count < target) {
-                    counter.innerText = Math.ceil(count + inc);
-                    setTimeout(() => animateCounters(), 20);
-                } else {
-                    counter.innerText = target;
-                }
-            });
-        }
-
-        const kpiSection = document.getElementById('impacto');
-        const observer = new IntersectionObserver((entries) => {
-            if(entries[0].isIntersecting) {
-                animateCounters();
-                observer.disconnect();
-            }
-        }, { threshold: 0.3 });
-        if(kpiSection) observer.observe(kpiSection);
-
-        window.toggleTimeline = function(id) {
-            document.querySelectorAll('.timeline-item').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.timeline-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(`dot-${id}`).classList.add('active');
-            document.getElementById(`content-${id}`).classList.add('active');
-        };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('skillsRadarChart').getContext('2d');
-            const skillsData = {
-                labels: [['Data Analytics', '(Python/R)'], ['Visualización', '(Power BI)'], ['Gestión de', 'Riesgos SSOMA'], ['Auditoría', 'Normativa ISO'], ['Modelado 3D', '(AutoCAD)'], ['Automatización', '(Excel)'] ],
-                datasets: [{
-                    label: 'Nivel de Competencia',
-                    data: [85, 90, 95, 88, 75, 85],
-                    backgroundColor: 'rgba(249, 115, 22, 0.15)',
-                    borderColor: 'rgba(249, 115, 22, 1)',
-                    pointBackgroundColor: '#0f172a',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(249, 115, 22, 1)',
-                    borderWidth: 2, pointRadius: 4, pointHoverRadius: 6
-                }]
-            };
-            const config = {
-                type: 'radar',
-                data: skillsData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleFont: { family: 'Inter', size: 13 }, bodyFont: { family: 'Inter', size: 14, weight: 'bold' }, padding: 12, displayColors: false, callbacks: { label: function(context) { return ` Nivel: ${context.raw}%`; } } }
-                    },
-                    scales: {
-                        r: { angleLines: { color: 'rgba(100, 116, 139, 0.2)' }, grid: { color: 'rgba(100, 116, 139, 0.2)' }, pointLabels: { color: '#0f172a', font: { family: 'Inter', size: 11, weight: '600' } }, ticks: { display: false, min: 0, max: 100, stepSize: 20 } }
-                    }
-                }
-            };
-            new Chart(ctx, config);
-        });
-    </script>
-    <script>// 1. Configuración de conexión
-const SUPABASE_URL = 'https://qocrodcuwywbksxvwtuz.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_Pt9z1uyQwzCBen2TIE4BdQ_LHOGeGeZ'; // La encuentras en Settings > API en Supabase
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// 2. Escuchar cuando se hace clic en el botón
-const formulario = document.getElementById('contactForm');
-
-formulario.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Evita que la página se refresque
-
-    // Cambiar texto del botón para feedback
-    const btn = document.getElementById('btnEnviar');
-    btn.innerText = "Enviando...";
-    btn.disabled = true;
-
-    // 3. Recolectar los datos de los inputs
-    const datosFormulario = {
-        nombre: document.getElementById('nombre').value,
-        telefono: document.getElementById('telefono').value,
-        email: document.getElementById('email').value,
-        motivo: document.getElementById('motivo').value,
-        detalles: document.getElementById('detalles').value
-    };
-
-    // 4. Enviar a la tabla 'consultas' de Supabase
-    const { data, error } = await _supabase
-        .from('consultas') 
-        .insert([datosFormulario]);
-
-    // 5. Manejar respuesta
-    if (error) {
-        alert("Error al enviar: " + error.message);
-        btn.innerText = "Reintentar";
-        btn.disabled = false;
-    } else {
-        alert("¡Datos enviados con éxito a Supabase!");
-        formulario.reset(); // Limpia los campos
-        btn.innerText = "Enviar Mensaje Directo";
-        btn.disabled = false;
-    }
-});</script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</body>
-</html>
+    </div>
+</section>
