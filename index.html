@@ -536,6 +536,48 @@
             new Chart(ctx, config);
         });
     </script>
+    <script>// 1. Configuración de conexión
+const SUPABASE_URL = 'https://qocrodcuwywbksxvwtuz.supabase.co';
+const SUPABASE_KEY = 'TU_ANON_KEY_AQUI'; // La encuentras en Settings > API en Supabase
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// 2. Escuchar cuando se hace clic en el botón
+const formulario = document.getElementById('contactForm');
+
+formulario.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Evita que la página se refresque
+
+    // Cambiar texto del botón para feedback
+    const btn = document.getElementById('btnEnviar');
+    btn.innerText = "Enviando...";
+    btn.disabled = true;
+
+    // 3. Recolectar los datos de los inputs
+    const datosFormulario = {
+        nombre: document.getElementById('nombre').value,
+        telefono: document.getElementById('telefono').value,
+        email: document.getElementById('email').value,
+        motivo: document.getElementById('motivo').value,
+        detalles: document.getElementById('detalles').value
+    };
+
+    // 4. Enviar a la tabla 'consultas' de Supabase
+    const { data, error } = await _supabase
+        .from('consultas') 
+        .insert([datosFormulario]);
+
+    // 5. Manejar respuesta
+    if (error) {
+        alert("Error al enviar: " + error.message);
+        btn.innerText = "Reintentar";
+        btn.disabled = false;
+    } else {
+        alert("¡Datos enviados con éxito a Supabase!");
+        formulario.reset(); // Limpia los campos
+        btn.innerText = "Enviar Mensaje Directo";
+        btn.disabled = false;
+    }
+});</script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
